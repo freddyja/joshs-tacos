@@ -108,22 +108,44 @@
     </form>
   </dialog>
 
-  <dialog id="install-dialog" class="dialog" aria-labelledby="install-heading">
+  <dialog id="install-dialog" class="dialog sheet" aria-labelledby="install-heading">
     <form method="dialog" class="dialog-body">
+      <span class="sheet-grip" aria-hidden="true"></span>
       <h2 id="install-heading" data-i18n="install.heading">Install Josh's Tacos</h2>
-      <p data-i18n="install.intro"></p>
-      <section data-platform="ios">
-        <h3 data-i18n="install.ios.heading"></h3>
-        <ol><li data-i18n="install.ios.1"></li><li data-i18n="install.ios.2"></li><li data-i18n="install.ios.3"></li></ol>
+      <p id="install-choose" data-i18n="install.choose">Choose your device:</p>
+      <div class="choice-row" role="group" aria-labelledby="install-choose">
+        <button type="button" class="choice" id="choice-android" data-choice="android" aria-pressed="false" aria-controls="panel-android">
+          <svg class="choice-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 18c0 .55.45 1 1 1h1v3.5a1.5 1.5 0 0 0 3 0V19h2v3.5a1.5 1.5 0 0 0 3 0V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8A1.5 1.5 0 0 0 2 9.5v7a1.5 1.5 0 0 0 3 0v-7A1.5 1.5 0 0 0 3.5 8zm17 0A1.5 1.5 0 0 0 19 9.5v7a1.5 1.5 0 0 0 3 0v-7A1.5 1.5 0 0 0 20.5 8zm-4.97-5.84 1.3-1.3a.5.5 0 0 0-.7-.71l-1.48 1.48A5.96 5.96 0 0 0 12 1c-.96 0-1.86.23-2.66.63L7.85.15a.5.5 0 0 0-.7.71l1.31 1.31A5.97 5.97 0 0 0 6 7h12a5.97 5.97 0 0 0-2.47-4.84zM10 5H9V4h1v1zm5 0h-1V4h1v1z"/></svg>
+          <span data-i18n="install.android">Android</span>
+          <span class="badge" data-i18n="install.detected" hidden>Your device</span>
+        </button>
+        <button type="button" class="choice" id="choice-apple" data-choice="apple" aria-pressed="false" aria-controls="panel-apple">
+          <svg class="choice-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.6c-.02-2.3 1.88-3.4 1.97-3.46a4.24 4.24 0 0 0-3.33-1.8c-1.42-.15-2.77.83-3.49.83-.72 0-1.83-.81-3.01-.79a4.46 4.46 0 0 0-3.77 2.29c-1.6 2.79-.41 6.92 1.15 9.18.76 1.11 1.67 2.35 2.86 2.31 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.13 2.77-2.24a9.8 9.8 0 0 0 1.25-2.58 4.01 4.01 0 0 1-2.35-3.72zM14.1 5.86A3.98 3.98 0 0 0 15.04 3a4.06 4.06 0 0 0-2.63 1.36 3.8 3.8 0 0 0-.96 2.76 3.36 3.36 0 0 0 2.65-1.26z"/></svg>
+          <span data-i18n="install.apple">iPhone / iPad</span>
+          <span class="badge" data-i18n="install.detected" hidden>Your device</span>
+        </button>
+      </div>
+
+      <section id="panel-android" class="install-panel" data-panel="android" hidden aria-labelledby="choice-android">
+        <button type="button" id="android-install-now" class="btn btn-red btn-block" data-i18n="install.android.now" hidden>Install now</button>
+        <p class="small" data-i18n="install.android.intro">Steps in Chrome:</p>
+        <ol class="steps">
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></span><span data-i18n="install.android.1">Open this page in Chrome.</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><circle cx="12" cy="19" r="2.2" fill="currentColor"/></svg></span><span data-i18n="install.android.2">Tap the Chrome menu (⋮).</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="install.android.3">Tap “Install app” or “Add to Home screen”.</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="install.android.4">Tap “Install” to confirm.</span></li>
+        </ol>
       </section>
-      <section data-platform="android">
-        <h3 data-i18n="install.android.heading"></h3>
-        <ol><li data-i18n="install.android.1"></li><li data-i18n="install.android.2"></li><li data-i18n="install.android.3"></li></ol>
+
+      <section id="panel-apple" class="install-panel" data-panel="apple" hidden aria-labelledby="choice-apple">
+        <ol class="steps">
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 8.5-2 5-5 2 2-5z" fill="currentColor"/></svg></span><span data-i18n="install.apple.1">Open this page in Safari.</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M7 10H5v11h14V10h-2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="install.apple.2">Tap the Share button.</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span data-i18n="install.apple.3">Choose “Add to Home Screen”.</span></li>
+          <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="install.apple.4">Tap “Add”.</span></li>
+        </ol>
       </section>
-      <section data-platform="other">
-        <h3 data-i18n="install.other.heading"></h3>
-        <p data-i18n="install.other.1"></p>
-      </section>
+
       <button value="close" class="btn btn-ghost btn-block" data-i18n="close">Close</button>
     </form>
   </dialog>

@@ -17,6 +17,9 @@
 
 * { box-sizing: border-box; }
 
+/* The hidden attribute must win over component display rules (.btn, .badge, …). */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
@@ -222,3 +225,43 @@ main > .error { background: var(--cream); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* ---------- install chooser sheet ---------- */
+.sheet {
+  margin: auto auto 0; width: min(560px, 100%); max-height: 92%;
+  border-radius: 20px 20px 0 0; border-bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.sheet-grip { justify-self: center; width: 48px; height: 5px; border-radius: 3px; background: #b9ab8d; }
+.choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice {
+  position: relative; display: grid; justify-items: center; gap: 4px;
+  min-height: 96px; padding: 12px 8px; border-radius: 14px; cursor: pointer;
+  background: var(--black); color: var(--cream); border: 3px solid var(--black);
+  font: 400 20px var(--display); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.choice-icon { width: 34px; height: 34px; color: var(--gold); }
+.choice.is-detected { border-color: var(--gold); box-shadow: 0 0 0 3px var(--red); }
+.choice[aria-pressed='true'] { background: var(--red); border-color: var(--gold); }
+.choice[aria-pressed='true'] .choice-icon { color: var(--cream); }
+.badge {
+  font: 700 12px var(--body); text-transform: none; letter-spacing: 0;
+  background: var(--gold); color: var(--black); border-radius: 999px; padding: 2px 8px;
+}
+.badge[hidden] { display: none; }
+.install-panel { display: grid; gap: 8px; }
+.install-panel[hidden] { display: none; }
+.dialog .steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; gap: 8px; }
+.steps li {
+  counter-increment: step; display: grid; grid-template-columns: 28px 44px 1fr; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 12px; background: #fff; border: 2px solid #e4d8bd; font-weight: 600;
+}
+.steps li::before {
+  content: counter(step); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--red-dark); color: #fff; font: 700 15px var(--body);
+}
+.step-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px;
+  background: var(--black); color: var(--gold);
+}
+.step-icon svg { width: 26px; height: 26px; }

@@ -19,6 +19,21 @@ export function installPlatform(nav) {
   return 'other';
 }
 
+/**
+ * What the Install chooser sheet should show.
+ * - show: false when the app already runs standalone (installed): no chooser.
+ * - highlight: the detected platform ('android' | 'apple' | null on desktop/unknown).
+ * - initial: the option opened first (detected platform, else Android when a native
+ *   prompt is available, else none so the user picks).
+ * - androidPrompt: true when the captured beforeinstallprompt can be used.
+ */
+export function chooserModel({ state, platform }) {
+  if (state === 'installed') return { show: false, highlight: null, initial: null, androidPrompt: false };
+  const highlight = platform === 'ios' ? 'apple' : platform === 'android' ? 'android' : null;
+  const androidPrompt = state === 'prompt';
+  return { show: true, highlight, initial: highlight || (androidPrompt ? 'android' : null), androidPrompt };
+}
+
 export function createInstaller(win, onChange = () => {}) {
   let deferred = null;
   let installed = isStandalone(win);

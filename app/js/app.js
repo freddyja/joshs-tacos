@@ -7,7 +7,7 @@ import {
 import { detectLang, getSavedLang, saveLang, createT } from './i18n.js';
 import { buildOrderText, smsHref, telHref, isIOS, SELLER_PHONE_DISPLAY } from './order.js';
 import { shareApp, copyText } from './share.js';
-import { createInstaller, installPlatform } from './install.js';
+import { createInstaller, installPlatform, chooserModel } from './install.js';
 import { createUpdater } from './updater.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -274,7 +274,11 @@ async function onShare() {
 }
 
 // ---------- install ----------
-const installer = createInstaller(window, () => renderInstallButton());
+const installer = createInstaller(window, () => {
+  renderInstallButton();
+  if ($('#install-dialog').open) renderChooser();
+});
+let chooserSelection = null;
 
 function renderInstallButton() {
   const b = $('#install-btn');
@@ -282,19 +286,53 @@ function renderInstallButton() {
   b.textContent = state.t(installed ? 'install.installed' : 'install');
   b.disabled = installed;
   b.dataset.state = installer.state;
+  // Running standalone (already installed): the chooser is never shown.
+  if (installed && $('#install-dialog').open) $('#install-dialog').close();
 }
 
-async function onInstall() {
+function renderChooser() {
+  const model = chooserModel({ state: installer.state, platform: installPlatform(navigator) });
+  const sheet = $('#install-dialog');
+  sheet.dataset.highlight = model.highlight || '';
+  document.querySelectorAll('#install-dialog .choice').forEach((btn) => {
+    const choice = btn.dataset.choice;
+    const selected = choice === chooserSelection;
+    btn.setAttribute('aria-pressed', String(selected));
+    btn.classList.toggle('is-detected', choice === model.highlight);
+    btn.querySelector('.badge').hidden = choice !== model.highlight;
+  });
+  document.querySelectorAll('#install-dialog [data-panel]').forEach((panel) => {
+    panel.hidden = panel.dataset.panel !== chooserSelection;
+  });
+  // Android: use the captured beforeinstallprompt when we have it, else show the steps.
+  $('#android-install-now').hidden = !model.androidPrompt;
+}
+
+function selectChoice(choice) {
+  chooserSelection = choice;
+  renderChooser();
+}
+
+function onInstall() {
+  const model = chooserModel({ state: installer.state, platform: installPlatform(navigator) });
+  if (!model.show) {
+    renderInstallButton();
+    return;
+  }
+  chooserSelection = model.initial;
+  renderChooser();
+  showDialog($('#install-dialog'));
+}
+
+async function onAndroidInstallNow() {
   const res = await installer.install();
-  if (res === 'manual') {
-    const platform = installPlatform(navigator);
-    document.querySelectorAll('#install-dialog [data-platform]').forEach((s) => {
-      // Show the matching instructions first; keep the others for reference.
-      s.hidden = platform !== 'other' && s.dataset.platform !== platform;
-    });
-    showDialog($('#install-dialog'));
-  } else if (res === 'accepted') toast(state.t('install.accepted'));
-  else if (res === 'dismissed') toast(state.t('install.dismissed'));
+  if (res === 'accepted' || res === 'installed') {
+    $('#install-dialog').close();
+    toast(state.t('install.accepted'));
+  } else {
+    if (res === 'dismissed') toast(state.t('install.dismissed'));
+    renderChooser(); // prompt is used up: the manual steps remain visible
+  }
   renderInstallButton();
 }
 
@@ -356,6 +394,9 @@ function wire() {
   });
   $('#share-btn').addEventListener('click', onShare);
   $('#install-btn').addEventListener('click', onInstall);
+  document.querySelectorAll('#install-dialog .choice').forEach((btn) =>
+    btn.addEventListener('click', () => selectChoice(btn.dataset.choice)));
+  $('#android-install-now').addEventListener('click', onAndroidInstallNow);
   $('#update-btn').addEventListener('click', onManualUpdate);
   $('#review-btn').addEventListener('click', openComposer);
   $('#clear-btn').addEventListener('click', () => {

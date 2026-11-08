@@ -1,5 +1,5 @@
 /* Josh's Tacos service worker. Bump VERSION (npm run bump -- x.y.z) on every deploy. */
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CACHE_PREFIX = 'jt-';
 const CACHE = `${CACHE_PREFIX}v${VERSION}`;
 

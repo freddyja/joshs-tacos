@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { shareApp, copyText } from '../../app/js/share.js';
-import { createInstaller, isStandalone, installPlatform } from '../../app/js/install.js';
+import { createInstaller, isStandalone, installPlatform, chooserModel } from '../../app/js/install.js';
 
 const args = { url: 'https://computingmadeeasy.org/joshs-tacos/', title: "Josh's Tacos", text: 'Order' };
 
@@ -89,5 +89,30 @@ describe('install', () => {
     expect(installPlatform({ userAgent: 'iPhone OS 17' })).toBe('ios');
     expect(installPlatform({ userAgent: 'Linux; Android 14' })).toBe('android');
     expect(installPlatform({ userAgent: 'Windows NT 10.0' })).toBe('other');
+  });
+});
+
+describe('install chooser', () => {
+  it('is hidden when running standalone (already installed)', () => {
+    for (const platform of ['ios', 'android', 'other']) {
+      expect(chooserModel({ state: 'installed', platform }).show).toBe(false);
+    }
+  });
+
+  it('auto-highlights and opens iPhone/iPad on iOS', () => {
+    expect(chooserModel({ state: 'manual', platform: 'ios' })).toEqual({ show: true, highlight: 'apple', initial: 'apple', androidPrompt: false });
+  });
+
+  it('auto-highlights Android and uses the captured prompt when available', () => {
+    expect(chooserModel({ state: 'prompt', platform: 'android' })).toEqual({ show: true, highlight: 'android', initial: 'android', androidPrompt: true });
+  });
+
+  it('Android without a captured prompt falls back to the Chrome menu steps', () => {
+    expect(chooserModel({ state: 'manual', platform: 'android' })).toEqual({ show: true, highlight: 'android', initial: 'android', androidPrompt: false });
+  });
+
+  it('unknown/desktop: nothing highlighted; opens Android only if a prompt exists', () => {
+    expect(chooserModel({ state: 'manual', platform: 'other' })).toEqual({ show: true, highlight: null, initial: null, androidPrompt: false });
+    expect(chooserModel({ state: 'prompt', platform: 'other' }).initial).toBe('android');
   });
 });

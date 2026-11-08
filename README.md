@@ -25,7 +25,7 @@ app/                  <- everything that gets deployed (plain HTML/CSS/JS ES mod
   js/order.js    order text, sms:/tel: links (iOS "&body=", Android "?body=")
   js/i18n.js     language detect / toggle
   js/share.js    Web Share -> copy link -> manual link
-  js/install.js  beforeinstallprompt -> iOS/Android instructions -> "Installed"
+  js/install.js  Install chooser: Android (beforeinstallprompt or Chrome steps) / iPhone-iPad (Safari steps)
   js/updater.js  automatic service-worker updates
   js/version.js  app version (keep in sync with sw.js)
   icons/ img/    crops of the poster (no third-party logos)
@@ -72,12 +72,16 @@ Do not add hours, address, tax, minimums, delivery, or named payment providers: 
    ```bash
    npm run bump -- 1.0.1
    ```
-3. Run the tests, then build the ZIP:
+3. Run the tests, then build the ZIP (top folder `joshs-tacos/`, includes `.htaccess`):
    ```bash
-   npm test && npm run test:e2e && npm run package
+   npm test && npm run test:e2e
    ```
-4. Upload the contents of `dist/joshs-tacos/` (or the ZIP) to `/joshs-tacos/` on the server.
-   Serve `sw.js` with `Cache-Control: no-cache` if the host allows it.
+   ```bash
+   npm run package -- docs/release/joshs-tacos-cme-v00N.zip
+   ```
+4. Unzip it in the web root so the files land in `/joshs-tacos/`. The bundled `.htaccess`
+   (`AddType application/manifest+json .webmanifest`) serves the manifest with the right type
+   on Apache. Serve `sw.js` with `Cache-Control: no-cache` if the host allows it.
 
 How customers get it: every time the app opens, regains focus or becomes visible again it calls
 `registration.update()`. When a new worker is installed the app saves the cart to
@@ -92,6 +96,18 @@ Proof: `tests/e2e/upgrade.spec.js` serves build v1, fills the cart, deploys v2, 
 refocuses (and, separately, reopens) the app, and asserts v2 is active, the cart is unchanged,
 exactly one reload happened, the old cache is gone, and a second focus does not reload.
 The last run's output is in `docs/evidence/upgrade-proof.json`.
+
+## Install chooser
+
+The **Install app** button opens a bottom sheet with two options:
+
+- **Android**: if Chrome fired `beforeinstallprompt`, an **Install now** button shows the native
+  prompt. Otherwise (or after it's dismissed) it shows the steps: Chrome menu ⋮ → *Install app* /
+  *Add to Home screen* → *Install*.
+- **iPhone / iPad**: four illustrated steps: open in Safari → tap Share → *Add to Home Screen* → *Add*.
+
+The detected platform is highlighted ("Your device") and opened first. When the app already runs
+standalone the button reads **Installed** and the chooser is never shown.
 
 ## Notes
 
