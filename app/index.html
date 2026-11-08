@@ -111,7 +111,8 @@
   <dialog id="install-dialog" class="dialog sheet" aria-labelledby="install-heading">
     <form method="dialog" class="dialog-body">
       <span class="sheet-grip" aria-hidden="true"></span>
-      <h2 id="install-heading" data-i18n="install.heading">Install Josh's Tacos</h2>
+      <h2 id="install-heading" data-i18n="install.heading">Add Josh's Tacos to your home screen</h2>
+      <p id="install-web" class="small" data-i18n="install.web">Josh's Tacos is a web app. Your browser adds it to your home screen, so there is no app store and no app file to download.</p>
       <p id="install-choose" data-i18n="install.choose">Choose your device:</p>
       <div class="choice-row" role="group" aria-labelledby="install-choose">
         <button type="button" class="choice" id="choice-android" data-choice="android" aria-pressed="false" aria-controls="panel-android">
@@ -127,7 +128,7 @@
       </div>
 
       <section id="panel-android" class="install-panel" data-panel="android" hidden aria-labelledby="choice-android">
-        <button type="button" id="android-install-now" class="btn btn-red btn-block" data-i18n="install.android.now" hidden>Install now</button>
+        <button type="button" id="android-install-now" class="btn btn-red btn-block" data-i18n="install.android.now" hidden>Add to Home screen</button>
         <p class="small" data-i18n="install.android.intro">Steps in Chrome:</p>
         <ol class="steps">
           <li><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></span><span data-i18n="install.android.1">Open this page in Chrome.</span></li>
@@ -146,6 +147,7 @@
         </ol>
       </section>
 
+      <p id="install-launch" class="small" data-i18n="install.launch">Then open it from your home screen. It opens like an app, without the browser's address bar.</p>
       <button value="close" class="btn btn-ghost btn-block" data-i18n="close">Close</button>
     </form>
   </dialog>

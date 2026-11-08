@@ -7,15 +7,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import os from 'node:os';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 const out = path.resolve(root, process.argv[2] || `dist/joshs-tacos-v${version}.zip`);
 
-const stageRoot = path.join(root, 'dist', '.stage');
+// A private staging folder per run, so parallel runs (e.g. tests) never collide.
+const stageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'jt-stage-'));
 const stage = path.join(stageRoot, 'joshs-tacos');
-fs.rmSync(stageRoot, { recursive: true, force: true });
-fs.mkdirSync(stageRoot, { recursive: true });
 fs.cpSync(path.join(root, 'app'), stage, { recursive: true });
 if (!fs.existsSync(path.join(stage, '.htaccess'))) throw new Error('app/.htaccess is missing');
 

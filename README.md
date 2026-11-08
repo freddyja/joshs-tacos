@@ -99,10 +99,16 @@ The last run's output is in `docs/evidence/upgrade-proof.json`.
 
 ## Install chooser
 
+Josh's Tacos is **web-only**: there is no app-provided Android package (APK/AAB), no app-store
+listing and no native wrapper. "Install" means the browser adds the web app to the home screen;
+installed launches open standalone (no address bar) from `display: "standalone"` in the manifest.
+Normal browser tabs keep their usual controls. `tests/unit/web-only.test.js` and the
+"web-only" e2e tests fail if an APK/store link, download link or native package is introduced.
+
 The **Install app** button opens a bottom sheet with two options:
 
-- **Android**: if Chrome fired `beforeinstallprompt`, an **Install now** button shows the native
-  prompt. Otherwise (or after it's dismissed) it shows the steps: Chrome menu ⋮ → *Install app* /
+- **Android**: if Chrome fired `beforeinstallprompt`, an **Add to Home screen** button shows the
+  browser's own prompt. Otherwise (or after it's dismissed) it shows the steps: Chrome menu ⋮ → *Install app* /
   *Add to Home screen* → *Install*.
 - **iPhone / iPad**: four illustrated steps: open in Safari → tap Share → *Add to Home Screen* → *Add*.
 

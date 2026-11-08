@@ -1,6 +1,6 @@
 {
   "name": "joshs-tacos",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Josh's Tacos pickup ordering PWA (English/Spanish). Static, no backend.",
   "type": "module",

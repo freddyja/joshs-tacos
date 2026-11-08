@@ -1,17 +1,18 @@
 
  RUN  v3.2.4 /home/user/joshs-tacos
 
- ✓ tests/unit/updater.test.js (9 tests) 17ms
- ✓ tests/unit/i18n.test.js (11 tests) 17ms
- ✓ tests/unit/package.test.js (2 tests) 80ms
+ ✓ tests/unit/web-only.test.js (10 tests) 114ms
+ ✓ tests/unit/i18n.test.js (11 tests) 22ms
+ ✓ tests/unit/package.test.js (2 tests) 135ms
  ✓ tests/unit/pwa.test.js (16 tests) 9ms
- ✓ tests/unit/share-install.test.js (15 tests) 9ms
- ✓ tests/unit/menu.test.js (6 tests) 7ms
+ ✓ tests/unit/updater.test.js (9 tests) 10ms
+ ✓ tests/unit/share-install.test.js (15 tests) 10ms
+ ✓ tests/unit/order.test.js (9 tests) 6ms
  ✓ tests/unit/cart.test.js (14 tests) 6ms
- ✓ tests/unit/order.test.js (9 tests) 4ms
+ ✓ tests/unit/menu.test.js (6 tests) 6ms
 
- Test Files  8 passed (8)
-      Tests  82 passed (82)
-   Start at  20:39:06
-   Duration  723ms (transform 108ms, setup 0ms, collect 257ms, tests 149ms, environment 1ms, prepare 498ms)
+ Test Files  9 passed (9)
+      Tests  92 passed (92)
+   Start at  21:28:52
+   Duration  909ms (transform 112ms, setup 0ms, collect 312ms, tests 318ms, environment 1ms, prepare 644ms)
 

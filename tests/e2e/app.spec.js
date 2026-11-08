@@ -252,12 +252,55 @@ test('install chooser: Spanish', async ({ browser }) => {
   const { ctx, page } = await pageWithUA(browser, UA.iphone);
   await page.click('#lang-btn');
   await page.click('#install-btn');
-  await expect(page.locator('#install-heading')).toHaveText('Instalar Josh\'s Tacos');
+  await expect(page.locator('#install-heading')).toHaveText("Agrega Josh's Tacos a tu pantalla de inicio");
   await expect(page.locator('#install-choose')).toHaveText('Elige tu dispositivo:');
   await expect(page.locator('#choice-apple .badge')).toHaveText('Tu dispositivo');
   await expect(page.locator('#panel-apple')).toContainText('Agregar a pantalla de inicio');
   await page.click('#choice-android');
   await expect(page.locator('#panel-android')).toContainText('menú de Chrome');
+  await ctx.close();
+});
+
+test('web-only: the Install chooser never downloads or navigates to an app package', async ({ browser }) => {
+  for (const [ua, withPrompt] of [[UA.android, false], [UA.android, true], [UA.iphone, false], [UA.desktop, false]]) {
+    const ctx = await browser.newContext({ userAgent: ua, viewport: { width: 390, height: 844 }, hasTouch: true });
+    const page = await ctx.newPage();
+    const downloads = [];
+    const native = [];
+    const popups = [];
+    page.on('download', (d) => downloads.push(d.url()));
+    ctx.on('request', (r) => { if (/\.(apk|aab|ipa)(\?|$)|play\.google\.com|market:|intent:/i.test(r.url())) native.push(r.url()); });
+    ctx.on('page', (p) => { if (p !== page) popups.push(p.url()); });
+    await open(page);
+    const url = page.url();
+    if (withPrompt) await firePrompt(page, 'dismissed');
+    await page.click('#install-btn');
+    await expect(page.locator('#install-web')).toContainText('web app');
+    await expect(page.locator('#install-web')).toContainText('no app store and no app file to download');
+    await expect(page.locator('#install-launch')).toBeVisible();
+    await expect(page.locator('#install-dialog a')).toHaveCount(0); // no links of any kind in the sheet
+    for (const id of ['#choice-android', '#choice-apple', '#choice-android']) await page.click(id);
+    if (withPrompt) {
+      await expect(page.locator('#android-install-now')).toHaveText('Add to Home screen');
+      await page.click('#android-install-now'); // browser-managed prompt only
+      expect(await page.evaluate(() => window.__prompted)).toBe(1);
+    }
+    await page.waitForTimeout(300);
+    expect(page.url()).toBe(url);
+    expect(downloads).toEqual([]);
+    expect(native).toEqual([]);
+    expect(popups).toEqual([]);
+    await ctx.close();
+  }
+});
+
+test('web-only: Spanish chooser describes a web app added by the browser', async ({ browser }) => {
+  const { ctx, page } = await pageWithUA(browser, UA.android);
+  await page.click('#lang-btn');
+  await page.click('#install-btn');
+  await expect(page.locator('#install-heading')).toHaveText("Agrega Josh's Tacos a tu pantalla de inicio");
+  await expect(page.locator('#install-web')).toContainText('app web');
+  await expect(page.locator('#install-launch')).toContainText('sin la barra de direcciones');
   await ctx.close();
 });
 
