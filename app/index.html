@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Josh's Tacos</title>
+  <meta name="description" content="Order Josh's Tacos for pickup by text message. Pide Josh's Tacos para recoger por mensaje de texto.">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Josh's Tacos">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#menu" data-i18n="skip">Skip to menu</a>
+
+  <div class="toolbar" role="toolbar" aria-label="App">
+    <button type="button" id="lang-btn" class="chip" data-i18n="lang.switch" data-i18n-aria="lang.switch.aria">Español</button>
+    <span class="toolbar-spacer"></span>
+    <button type="button" id="share-btn" class="chip" data-i18n="share">Share</button>
+    <button type="button" id="install-btn" class="chip" data-i18n="install">Install app</button>
+  </div>
+
+  <header class="hero">
+    <img class="hero-img" src="img/tacos.jpg" alt="" width="280" height="280">
+    <h1 class="brand"><span class="brand-top">Josh's</span> <span class="brand-bottom">Tacos</span></h1>
+    <p class="ribbon ribbon-cream"><span aria-hidden="true">★</span> <span data-i18n="slogan.1">Simple ingredients. Big flavor.</span> <span aria-hidden="true">★</span></p>
+    <p class="ribbon ribbon-gold"><span aria-hidden="true">♥</span> <span data-i18n="slogan.2">Good food. Made with love.</span> <span aria-hidden="true">♥</span></p>
+  </header>
+
+  <div id="offline-banner" class="banner" role="status" hidden data-i18n="offline">Offline — prices may be out of date. Confirm with the seller.</div>
+
+  <section class="info" aria-label="Info">
+    <p class="info-pickup"><strong data-i18n="pickup">Pickup only</strong></p>
+    <p data-i18n="payment">Cash &amp; electronic payments accepted</p>
+    <p class="info-howto" data-i18n="howto"></p>
+  </section>
+
+  <main id="menu" tabindex="-1">
+    <h2 class="visually-hidden" data-i18n="menu.heading">Menu</h2>
+    <div id="menu-root" aria-busy="true"></div>
+    <div id="menu-error" class="error" role="alert" hidden>
+      <p data-i18n="error.menu">The menu couldn't load. / No se pudo cargar el menú.</p>
+      <button type="button" id="menu-retry" class="btn btn-gold" data-i18n="error.retry">Try again</button>
+    </div>
+
+    <section id="cart" class="panel cart" aria-labelledby="cart-heading">
+      <h2 id="cart-heading" data-i18n="cart.heading">Your order</h2>
+      <p id="cart-empty" class="muted" data-i18n="cart.empty"></p>
+      <ul id="cart-lines" class="cart-lines"></ul>
+      <label class="maria-toggle">
+        <input type="checkbox" id="maria-check">
+        <span data-i18n="maria">Ask about the Maria Special</span>
+      </label>
+      <div class="subtotal">
+        <span data-i18n="cart.subtotal">Estimated subtotal</span>
+        <strong id="subtotal">$0.00</strong>
+      </div>
+      <p class="note" data-i18n="cart.note">Seller confirms price, pickup time &amp; availability</p>
+      <p id="storage-error" class="error" role="alert" hidden data-i18n="error.storage"></p>
+      <p id="cart-error" class="error" role="alert" hidden data-i18n="error.empty"></p>
+      <div class="cart-actions">
+        <button type="button" id="review-btn" class="btn btn-red btn-block" data-i18n="cart.review">Review &amp; text order</button>
+        <button type="button" id="clear-btn" class="btn btn-ghost" data-i18n="cart.clear">Clear order</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="ribbon ribbon-red" data-i18n="slogan.3">Fresh. Filling. Homemade.</p>
+    <p><strong data-i18n="pickup">Pickup only</strong> · <span data-i18n="payment">Cash &amp; electronic payments accepted</span></p>
+    <p id="contact-line"></p>
+    <p class="thanks" data-i18n="thanks">Thank you for your support!</p>
+    <div class="update-row">
+      <button type="button" id="update-btn" class="btn btn-gold" data-i18n="update">Check for updates</button>
+      <span id="update-status" role="status" aria-live="polite"></span>
+    </div>
+    <p class="muted small"><span id="app-version"></span> · <span id="menu-version"></span></p>
+  </footer>
+
+  <a id="cart-bar" class="cart-bar" href="#cart" hidden>
+    <span data-i18n="cart.open">View order</span>
+    <span id="cart-bar-count"></span>
+    <strong id="cart-bar-total"></strong>
+  </a>
+
+  <dialog id="composer" class="dialog" aria-labelledby="composer-heading">
+    <form method="dialog" class="dialog-body">
+      <h2 id="composer-heading" data-i18n="composer.heading">Send your order</h2>
+      <label for="name-input" data-i18n="composer.name">Your name (optional)</label>
+      <input id="name-input" type="text" autocomplete="name" maxlength="60">
+      <p class="label" id="preview-label" data-i18n="composer.preview">Message preview</p>
+      <textarea id="order-preview" rows="7" readonly aria-labelledby="preview-label"></textarea>
+      <p class="note" data-i18n="cart.note">Seller confirms price, pickup time &amp; availability</p>
+      <p class="small" data-i18n="composer.how"></p>
+      <a id="sms-link" class="btn btn-red btn-block" href="#" data-i18n="order.cta">Text my order</a>
+      <div class="dialog-row">
+        <a id="call-link" class="btn btn-gold" href="#"></a>
+        <button type="button" id="copy-btn" class="btn btn-gold" data-i18n="copy">Copy order summary</button>
+      </div>
+      <p class="small muted" data-i18n="composer.fallback"></p>
+      <button value="close" class="btn btn-ghost btn-block" data-i18n="close">Close</button>
+    </form>
+  </dialog>
+
+  <dialog id="install-dialog" class="dialog" aria-labelledby="install-heading">
+    <form method="dialog" class="dialog-body">
+      <h2 id="install-heading" data-i18n="install.heading">Install Josh's Tacos</h2>
+      <p data-i18n="install.intro"></p>
+      <section data-platform="ios">
+        <h3 data-i18n="install.ios.heading"></h3>
+        <ol><li data-i18n="install.ios.1"></li><li data-i18n="install.ios.2"></li><li data-i18n="install.ios.3"></li></ol>
+      </section>
+      <section data-platform="android">
+        <h3 data-i18n="install.android.heading"></h3>
+        <ol><li data-i18n="install.android.1"></li><li data-i18n="install.android.2"></li><li data-i18n="install.android.3"></li></ol>
+      </section>
+      <section data-platform="other">
+        <h3 data-i18n="install.other.heading"></h3>
+        <p data-i18n="install.other.1"></p>
+      </section>
+      <button value="close" class="btn btn-ghost btn-block" data-i18n="close">Close</button>
+    </form>
+  </dialog>
+
+  <dialog id="share-dialog" class="dialog" aria-labelledby="share-heading">
+    <form method="dialog" class="dialog-body">
+      <h2 id="share-heading" data-i18n="share.heading">Share this link</h2>
+      <label for="share-url" data-i18n="share.manual"></label>
+      <input id="share-url" type="url" readonly>
+      <button value="close" class="btn btn-ghost btn-block" data-i18n="close">Close</button>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "spec": "joshs-tacos-spec-v005 §5 auto-update",
+  "from": "1.0.0",
+  "to": "2.0.0",
+  "scenarios": {
+    "refocus": {
+      "before": {
+        "swVersion": "1.0.0",
+        "pageVersion": "Version 1.0.0",
+        "cart": "{\"lines\":[{\"sku\":\"combo-taco\",\"qty\":1},{\"sku\":\"empanada-2\",\"qty\":2}],\"askMaria\":true}",
+        "caches": [
+          "jt-v1.0.0"
+        ],
+        "guard": null,
+        "subtotal": "$20.00"
+      },
+      "after": {
+        "swVersion": "2.0.0",
+        "pageVersion": "Version 2.0.0",
+        "cart": "{\"lines\":[{\"sku\":\"combo-taco\",\"qty\":1},{\"sku\":\"empanada-2\",\"qty\":2}],\"askMaria\":true}",
+        "caches": [
+          "jt-v2.0.0"
+        ],
+        "guard": "2.0.0",
+        "subtotal": "$20.00"
+      },
+      "reloads": 1,
+      "reloadsAfterSecondFocus": 1,
+      "pass": true
+    },
+    "reopen": {
+      "before": {
+        "swVersion": "1.0.0",
+        "pageVersion": "Version 1.0.0",
+        "cart": "{\"lines\":[{\"sku\":\"combo-taco\",\"qty\":1},{\"sku\":\"empanada-2\",\"qty\":2}],\"askMaria\":true}",
+        "caches": [
+          "jt-v1.0.0"
+        ],
+        "guard": null,
+        "subtotal": "$20.00"
+      },
+      "after": {
+        "swVersion": "2.0.0",
+        "pageVersion": "Version 2.0.0",
+        "cart": "{\"lines\":[{\"sku\":\"combo-taco\",\"qty\":1},{\"sku\":\"empanada-2\",\"qty\":2}],\"askMaria\":true}",
+        "caches": [
+          "jt-v2.0.0"
+        ],
+        "guard": "2.0.0",
+        "subtotal": "$20.00"
+      },
+      "reloads": 1,
+      "pass": true
+    },
+    "manualButton": {
+      "reloads": 1,
+      "after": {
+        "swVersion": "2.0.0",
+        "pageVersion": "Version 2.0.0",
+        "cart": "{\"lines\":[{\"sku\":\"combo-taco\",\"qty\":1},{\"sku\":\"empanada-2\",\"qty\":2}],\"askMaria\":true}",
+        "caches": [
+          "jt-v2.0.0"
+        ],
+        "guard": "2.0.0",
+        "subtotal": "$20.00"
+      },
+      "pass": true
+    },
+    "deferredWhileComposerOpen": {
+      "reloads": 1,
+      "pass": true
+    }
+  },
+  "ranAt": "2026-11-08T19:51:13.780Z"
+}

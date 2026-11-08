@@ -1,0 +1,64 @@
+{
+  "version": "2026.11.08",
+  "updated": "2026-11-08",
+  "currency": "USD",
+  "source": "docs/joshs-tacos-menu-reference-v001.jpg",
+  "categories": [
+    {
+      "id": "tacos",
+      "items": [
+        {
+          "id": "tacos",
+          "packs": [
+            { "sku": "taco-1", "count": 1, "priceCents": 300 },
+            { "sku": "taco-3", "count": 3, "priceCents": 800 },
+            { "sku": "taco-5", "count": 5, "priceCents": 1200 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empanadas",
+      "items": [
+        {
+          "id": "empanadas",
+          "packs": [
+            { "sku": "empanada-1", "count": 1, "priceCents": 300 },
+            { "sku": "empanada-2", "count": 2, "priceCents": 500 },
+            { "sku": "empanada-3", "count": 3, "priceCents": 700 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sides",
+      "items": [
+        { "id": "rice", "packs": [{ "sku": "rice", "count": 1, "priceCents": 300 }] },
+        { "id": "beans", "packs": [{ "sku": "beans", "count": 1, "priceCents": 300 }] },
+        { "id": "chips", "packs": [{ "sku": "chips", "count": 1, "priceCents": 100 }] },
+        { "id": "cornbread", "packs": [{ "sku": "cornbread", "count": 1, "priceCents": 100 }] }
+      ]
+    },
+    {
+      "id": "drinks",
+      "items": [
+        { "id": "tea", "packs": [{ "sku": "tea", "count": 1, "priceCents": 200 }] }
+      ]
+    },
+    {
+      "id": "combos",
+      "items": [
+        { "id": "combo-taco", "includes": ["taco-3", "rice", "tea"], "packs": [{ "sku": "combo-taco", "count": 1, "priceCents": 1000 }] },
+        { "id": "combo-big", "includes": ["taco-5", "rice", "tea"], "packs": [{ "sku": "combo-big", "count": 1, "priceCents": 1300 }] },
+        { "id": "combo-sides", "includes": ["taco-3", "rice", "beans", "chips", "tea"], "packs": [{ "sku": "combo-sides", "count": 1, "priceCents": 1200 }] },
+        { "id": "combo-full", "includes": ["taco-5", "rice", "beans", "chips", "tea"], "packs": [{ "sku": "combo-full", "count": 1, "priceCents": 1500 }] }
+      ]
+    },
+    {
+      "id": "special",
+      "items": [
+        { "id": "maria", "inquiryOnly": true, "packs": [] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+
+ RUN  v3.2.4 /home/user/joshs-tacos
+
+ ✓ tests/unit/share-install.test.js (10 tests) 8ms
+ ✓ tests/unit/updater.test.js (9 tests) 10ms
+ ✓ tests/unit/i18n.test.js (11 tests) 27ms
+ ✓ tests/unit/cart.test.js (14 tests) 6ms
+ ✓ tests/unit/menu.test.js (6 tests) 4ms
+ ✓ tests/unit/pwa.test.js (16 tests) 12ms
+ ✓ tests/unit/order.test.js (9 tests) 8ms
+
+ Test Files  7 passed (7)
+      Tests  75 passed (75)
+   Start at  19:50:46
+   Duration  755ms (transform 93ms, setup 0ms, collect 245ms, tests 75ms, environment 1ms, prepare 568ms)
+

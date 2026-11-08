@@ -1,0 +1,20 @@
+{
+  "name": "joshs-tacos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Josh's Tacos pickup ordering PWA (English/Spanish). Static, no backend.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:e2e": "playwright test --trace off",
+    "test:all": "vitest run && playwright test --trace off",
+    "serve": "node scripts/serve.mjs",
+    "bump": "node scripts/bump-version.mjs",
+    "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.63.0",
+    "vitest": "3.2.4"
+  }
+}

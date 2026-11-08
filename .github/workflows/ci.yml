@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Unit tests (pricing, cart, order text, i18n parity, updater, PWA config)
+        run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: E2E tests (buttons, offline, a11y, v1 -> v2 upgrade proof)
+        run: npm run test:e2e
+      - name: Package deployable ZIP
+        run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: joshs-tacos-zip
+          path: dist/*.zip
