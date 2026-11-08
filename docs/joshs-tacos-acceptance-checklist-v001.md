@@ -1,0 +1,14 @@
+# Acceptance Checklist v001 (DRAFT). All items must pass before any demo.
+- [ ] Menu matches poster exactly (re-verified against image); prices in cents; no invented hours/address/tax/min/payment/stock
+- [ ] Maria Special inquiry-only, never priced
+- [ ] Packs added as exact lines; subtotal labeled "estimated"; no final total
+- [ ] SMS composer opens to +13526068731 with prefilled EN/ES text; never auto-sends; tel: and copy fallbacks work
+- [ ] EN/ES 100% key parity (automated test); toggle persists; no Portuguese anywhere
+- [ ] Share: Web Share on mobile; copy fallback on desktop; manual fallback
+- [ ] Install: prompt on Chrome/Edge/Android; iOS instructions; "Installed" state
+- [ ] Update: version bump detected on start/focus/button; refresh preserves cart; only jt- caches removed
+- [ ] Offline: loads, stale-price banner shown, composer still works
+- [ ] Palette black/red/gold/cream from poster; WCAG AA contrast
+- [ ] Hosted on computingmadeeasy.org (not github.io); source in private freddyja repo
+- [ ] Short user guide EN delivered; files versioned, copied without overwrite
+- [ ] Freddy approval recorded before publish, app-center link, and each handoff
