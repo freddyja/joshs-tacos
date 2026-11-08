@@ -1,0 +1,17 @@
+# Acceptance Checklist v003. All items must pass before any demo.
+- [ ] Menu matches poster exactly (reference jpg v001); prices in cents; no invented hours/address/tax/min/payment/stock
+- [ ] Maria Special inquiry-only, never priced
+- [ ] Packs added as exact lines; subtotal labeled "estimated"; no final total
+- [ ] SMS composer opens to +13526068731 with prefilled EN/ES text; never auto-sends; tel: and copy fallbacks work
+- [ ] EN/ES 100% key parity (automated test); toggle persists; no Portuguese anywhere
+- [ ] Share: Web Share on mobile; copy fallback on desktop; manual fallback
+- [ ] Install: prompt on Chrome/Edge/Android; iOS instructions; "Installed" state
+- [ ] Auto-update: on open and on focus, a new version activates and reloads automatically (no prompt), the cart is preserved, exactly one reload, no loop. Manual button works. Only jt- caches removed. Two-version Playwright proof saved.
+- [ ] Offline: loads, stale-price banner shown, composer still works
+- [ ] Palette black/red/gold/cream from poster; WCAG AA contrast
+- [ ] Hosted on computingmadeeasy.org (not github.io); source in PUBLIC freddyja repo
+- [ ] Short user guide EN delivered; files versioned, copied without overwrite
+- [ ] Live at computingmadeeasy.org/joshs-tacos/ and App Center entry added, other apps unchanged
+- [ ] Five GGL handoffs + Docu/OneDrive copies done (no overwrite)
+- [ ] No app-store submission, no customer contact
+- [ ] Poster crops omit third-party logos
