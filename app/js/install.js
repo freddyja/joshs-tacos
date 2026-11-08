@@ -1,4 +1,7 @@
-// Install: beforeinstallprompt when available, otherwise manual instructions.
+// "Install" is web-only guidance (owner request): a plain link to the app plus
+// bookmark / browser "Add to Home Screen" steps. The app never invokes the
+// beforeinstallprompt event's prompt method and never triggers the browser's
+// native install prompt; there is no app-provided package or download.
 import { isIOS } from './order.js';
 
 export function isStandalone(win) {
@@ -20,51 +23,35 @@ export function installPlatform(nav) {
 }
 
 /**
- * What the Install chooser sheet should show.
- * - show: false when the app already runs standalone (installed): no chooser.
+ * What the Install guidance sheet should show.
+ * - show: false when the app already runs standalone (launched from the home screen).
  * - highlight: the detected platform ('android' | 'apple' | null on desktop/unknown).
- * - initial: the option opened first (detected platform, else Android when a native
- *   prompt is available, else none so the user picks).
- * - androidPrompt: true when the captured beforeinstallprompt can be used.
+ * - initial: the option opened first (the detected platform, else none so the user picks).
  */
 export function chooserModel({ state, platform }) {
-  if (state === 'installed') return { show: false, highlight: null, initial: null, androidPrompt: false };
+  if (state === 'installed') return { show: false, highlight: null, initial: null };
   const highlight = platform === 'ios' ? 'apple' : platform === 'android' ? 'android' : null;
-  const androidPrompt = state === 'prompt';
-  return { show: true, highlight, initial: highlight || (androidPrompt ? 'android' : null), androidPrompt };
+  return { show: true, highlight, initial: highlight };
 }
 
+/**
+ * Tracks whether the app runs standalone. The browser's automatic install prompt
+ * (beforeinstallprompt) is suppressed and never shown: the event is not kept and
+ * prompt() is never called.
+ */
 export function createInstaller(win, onChange = () => {}) {
-  let deferred = null;
   let installed = isStandalone(win);
   win.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferred = e;
-    onChange();
   });
   win.addEventListener('appinstalled', () => {
     installed = true;
-    deferred = null;
     onChange();
   });
   return {
-    /** 'installed' | 'prompt' | 'manual' */
+    /** 'installed' | 'manual' */
     get state() {
-      if (installed) return 'installed';
-      return deferred ? 'prompt' : 'manual';
-    },
-    /** Returns 'accepted' | 'dismissed' | 'manual' | 'installed'. */
-    async install() {
-      if (installed) return 'installed';
-      if (!deferred) return 'manual';
-      const evt = deferred;
-      deferred = null;
-      await evt.prompt();
-      const choice = await Promise.resolve(evt.userChoice).catch(() => ({ outcome: 'dismissed' }));
-      const accepted = Boolean(choice && choice.outcome === 'accepted');
-      if (accepted) installed = true;
-      onChange();
-      return accepted ? 'accepted' : 'dismissed';
+      return installed ? 'installed' : 'manual';
     },
   };
 }

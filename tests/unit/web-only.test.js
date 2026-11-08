@@ -55,19 +55,44 @@ describe('web-only: no app-provided native package or installer', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   });
 
-  it('EN/ES install text describes a web app added by the browser, with no download', () => {
+  it('EN/ES install text: a website/link, not an app download; bookmark or home screen', () => {
     const en = readJSON('i18n/en.json');
     const es = readJSON('i18n/es.json');
-    expect(en['install.web']).toMatch(/web app/);
-    expect(en['install.web']).toMatch(/no app store and no app file to download/);
-    expect(es['install.web']).toMatch(/app web/);
-    expect(es['install.web']).toMatch(/no hay tienda de apps ni archivo de app que descargar/);
-    expect(en['install.heading']).toMatch(/home screen/);
-    expect(es['install.heading']).toMatch(/pantalla de inicio/);
-    // Truthful: no claims about WebAPKs, Play Protect, or store verification.
-    for (const d of [en, es]) {
-      expect(Object.values(d).join(' ')).not.toMatch(/webapk|play protect|google play|app store approved|verified by/i);
+    expect(en['install.web']).toBe("Josh's Tacos is a website, not an app download. Open this link in your browser, then bookmark it or add it to your home screen.");
+    expect(es['install.web']).toBe("Josh's Tacos es un sitio web, no una app para descargar. Abre este enlace en tu navegador y guárdalo en favoritos o agrégalo a tu pantalla de inicio.");
+    expect(en['install.launch']).toMatch(/normal browser tab with the usual browser controls/);
+    expect(en['install.launch']).toMatch(/may show full screen, depending on your browser/);
+    expect(es['install.launch']).toMatch(/pestaña normal del navegador/);
+    expect(es['install.launch']).toMatch(/según tu navegador/);
+    // Android steps are web shortcut steps, not an app install.
+    for (const k of ['install.android.1', 'install.android.2', 'install.android.3', 'install.android.4']) {
+      expect(en[k], k).not.toMatch(/install/i);
+      expect(es[k], k).not.toMatch(/instal/i);
     }
+    expect(en['install.android.3']).toMatch(/Add to Home screen.*Create shortcut/);
+    // Truthful: no native-app, WebAPK, Play Protect, store, or guaranteed chrome-free claims.
+    for (const d of [en, es]) {
+      const all = Object.values(d).join(' ');
+      expect(all).not.toMatch(/webapk|play protect|google play|app store approved|verified by|native app|app nativa|without the browser's address bar|sin la barra de direcciones/i);
+    }
+  });
+
+  it('the app never calls beforeinstallprompt.prompt() (no native install prompt)', () => {
+    for (const f of files.filter((x) => x.endsWith('.js'))) {
+      const src = fs.readFileSync(f, 'utf8');
+      expect(src, f).not.toMatch(/\.prompt\(/);
+      expect(src, f).not.toMatch(/userChoice/);
+    }
+    expect(readText('index.html')).not.toContain('android-install-now');
+  });
+
+  it('Install sheet offers a plain relative link to the same app URL', () => {
+    const html = readText('index.html');
+    const m = html.match(/<a id="install-link"[^>]*>([^<]*)<\/a>/);
+    expect(m).not.toBeNull();
+    expect(m[0]).toContain('href="./"');
+    expect(m[0]).not.toMatch(/target=|download/);
+    expect(m[1]).toBe('https://computingmadeeasy.org/joshs-tacos/');
   });
 });
 

@@ -265,3 +265,11 @@ main > .error { background: var(--cream); }
   background: var(--black); color: var(--gold);
 }
 .step-icon svg { width: 26px; height: 26px; }
+
+/* plain web link in the install guidance sheet */
+.install-link-row { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.install-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: 10px;
+  background: #fff; border: 2px solid var(--red-dark); color: var(--red-dark); font-weight: 700;
+  word-break: break-all;
+}

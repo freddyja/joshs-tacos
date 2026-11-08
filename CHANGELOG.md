@@ -1,13 +1,16 @@
 # Changelog
 
 ## 1.1.1 — 2026-11-08
-- Web-only release (owner request): the Install chooser now says, in EN/ES, that this is a
-  web app the browser adds to the home screen, with no app store and no app file to download,
-  and that it opens without the browser's address bar from the home screen. Android's button
-  reads "Add to Home screen" and only triggers the browser's own `beforeinstallprompt`.
-- Manifest states `prefer_related_applications: false`; no native packages or store links anywhere.
-- Regression tests: no APK/AAB/IPA files or links, no download links, no store/intent URLs,
-  no navigation/download/popup from the chooser; manifest standalone + icon sizes verified.
+- Web-only release (owner request): **Install is a plain link plus guidance**, not an app download.
+  The sheet (EN/ES) says Josh's Tacos is a website, shows the app link (same URL), and explains
+  bookmarking or the browser's Add to Home Screen. The link opens in a normal browser tab.
+- The app never calls `beforeinstallprompt.prompt()`; the browser's automatic install prompt is
+  suppressed and the "Install now" button is removed. Android steps now say *Add to Home screen*
+  (→ *Create shortcut* if asked) instead of *Install app*.
+- No claims of a native app or a guaranteed full-screen launch.
+- Manifest states `prefer_related_applications: false` (still standalone, same icons and colours).
+- Regression tests: no APK/AAB/IPA files or links, no store/intent URLs, no download links, no
+  `prompt()` call, no navigation/download/popup from the sheet; manifest and icon sizes verified.
 - Packaging uses a private temp staging folder per run (parallel runs no longer collide).
 - Service-worker cache bumped to `jt-v1.1.1`. Release ZIP: `docs/release/joshs-tacos-cme-v003.zip`.
 

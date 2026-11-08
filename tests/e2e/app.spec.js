@@ -140,13 +140,6 @@ async function pageWithUA(browser, ua) {
   return { ctx, page };
 }
 
-const firePrompt = (page, outcome = 'accepted') => page.evaluate((o) => {
-  const e = new Event('beforeinstallprompt', { cancelable: true });
-  e.prompt = async () => { window.__prompted = (window.__prompted || 0) + 1; };
-  e.userChoice = Promise.resolve({ outcome: o });
-  window.dispatchEvent(e);
-}, outcome);
-
 test('install chooser: Install opens a sheet with Android and iPhone/iPad options', async ({ browser }) => {
   const { ctx, page } = await pageWithUA(browser, UA.desktop);
   await page.click('#install-btn');
@@ -173,9 +166,9 @@ test('install chooser: Install opens a sheet with Android and iPhone/iPad option
   await page.click('#choice-android');
   await expect(page.locator('#panel-apple')).toBeHidden();
   await expect(page.locator('#panel-android')).toBeVisible();
-  await expect(page.locator('#android-install-now')).toBeHidden(); // no captured prompt
   await expect(page.locator('#panel-android')).toContainText('Chrome menu');
-  await expect(page.locator('#panel-android')).toContainText('Install app');
+  await expect(page.locator('#panel-android')).toContainText('Add to Home screen');
+  await expect(page.locator('#panel-android')).not.toContainText('Install');
   await ctx.close();
 });
 
@@ -201,33 +194,7 @@ test('install chooser: Android without a prompt shows the Chrome menu steps', as
   await page.click('#install-btn');
   await expect(page.locator('#choice-android')).toHaveClass(/is-detected/);
   await expect(page.locator('#panel-android')).toBeVisible();
-  await expect(page.locator('#android-install-now')).toBeHidden();
   await expect(page.locator('#panel-android .steps li')).toHaveCount(4);
-  await ctx.close();
-});
-
-test('install chooser: Android uses the captured beforeinstallprompt', async ({ browser }) => {
-  const { ctx, page } = await pageWithUA(browser, UA.android);
-  await firePrompt(page, 'accepted');
-  await page.click('#install-btn');
-  await expect(page.locator('#android-install-now')).toBeVisible();
-  await page.click('#android-install-now');
-  expect(await page.evaluate(() => window.__prompted)).toBe(1);
-  await expect(page.locator('#install-dialog')).toBeHidden();
-  await expect(page.locator('#install-btn')).toHaveText('Installed');
-  await expect(page.locator('#install-btn')).toBeDisabled();
-  await ctx.close();
-});
-
-test('install chooser: a dismissed prompt leaves the manual steps', async ({ browser }) => {
-  const { ctx, page } = await pageWithUA(browser, UA.android);
-  await firePrompt(page, 'dismissed');
-  await page.click('#install-btn');
-  await page.click('#android-install-now');
-  await expect(page.locator('#install-dialog')).toBeVisible();
-  await expect(page.locator('#android-install-now')).toBeHidden();
-  await expect(page.locator('#panel-android .steps')).toBeVisible();
-  await expect(page.locator('#install-btn')).toHaveText('Install app');
   await ctx.close();
 });
 
@@ -261,8 +228,8 @@ test('install chooser: Spanish', async ({ browser }) => {
   await ctx.close();
 });
 
-test('web-only: the Install chooser never downloads or navigates to an app package', async ({ browser }) => {
-  for (const [ua, withPrompt] of [[UA.android, false], [UA.android, true], [UA.iphone, false], [UA.desktop, false]]) {
+test('web-only: Install is a plain link + guidance; no native prompt, download or package', async ({ browser }) => {
+  for (const [ua, browserOffersPrompt] of [[UA.android, false], [UA.android, true], [UA.iphone, false], [UA.desktop, true]]) {
     const ctx = await browser.newContext({ userAgent: ua, viewport: { width: 390, height: 844 }, hasTouch: true });
     const page = await ctx.newPage();
     const downloads = [];
@@ -273,22 +240,46 @@ test('web-only: the Install chooser never downloads or navigates to an app packa
     ctx.on('page', (p) => { if (p !== page) popups.push(p.url()); });
     await open(page);
     const url = page.url();
-    if (withPrompt) await firePrompt(page, 'dismissed');
-    await page.click('#install-btn');
-    await expect(page.locator('#install-web')).toContainText('web app');
-    await expect(page.locator('#install-web')).toContainText('no app store and no app file to download');
-    await expect(page.locator('#install-launch')).toBeVisible();
-    await expect(page.locator('#install-dialog a')).toHaveCount(0); // no links of any kind in the sheet
-    for (const id of ['#choice-android', '#choice-apple', '#choice-android']) await page.click(id);
-    if (withPrompt) {
-      await expect(page.locator('#android-install-now')).toHaveText('Add to Home screen');
-      await page.click('#android-install-now'); // browser-managed prompt only
-      expect(await page.evaluate(() => window.__prompted)).toBe(1);
+    if (browserOffersPrompt) {
+      // The browser fires beforeinstallprompt: the app must suppress it and never call prompt().
+      const prevented = await page.evaluate(() => {
+        const e = new Event('beforeinstallprompt', { cancelable: true });
+        e.prompt = async () => { window.__prompted = (window.__prompted || 0) + 1; };
+        e.userChoice = Promise.resolve({ outcome: 'accepted' });
+        window.dispatchEvent(e);
+        return e.defaultPrevented;
+      });
+      expect(prevented).toBe(true);
     }
+    await page.click('#install-btn');
+    await expect(page.locator('#install-web')).toHaveText("Josh's Tacos is a website, not an app download. Open this link in your browser, then bookmark it or add it to your home screen.");
+    await expect(page.locator('#install-launch')).toContainText('normal browser tab');
+    // Exactly one link in the sheet: the plain app link, same URL, no download/new window.
+    const links = page.locator('#install-dialog a');
+    await expect(links).toHaveCount(1);
+    await expect(links).toHaveAttribute('href', './');
+    expect(await links.getAttribute('download')).toBeNull();
+    expect(await links.getAttribute('target')).toBeNull();
+    expect(await links.evaluate((a) => a.href)).toBe(url);
+    await expect(links).toHaveText(url);
+    await expect(page.locator('#android-install-now')).toHaveCount(0);
+    for (const id of ['#choice-android', '#choice-apple', '#choice-android']) await page.click(id);
     await page.waitForTimeout(300);
+    expect(await page.evaluate(() => window.__prompted)).toBeUndefined(); // never prompted
+    await expect(page.locator('#install-btn')).toHaveText('Install app'); // not "Installed"
     expect(page.url()).toBe(url);
     expect(downloads).toEqual([]);
     expect(native).toEqual([]);
+    expect(popups).toEqual([]);
+    // Following the link just opens the same app URL in this normal tab; the cart survives.
+    await page.click('#install-dialog button[value=close]');
+    await page.click('[data-sku=tea]');
+    await page.click('#install-btn');
+    await page.click('#install-link');
+    await page.waitForSelector('body[data-ready=true]');
+    expect(page.url()).toBe(url);
+    await expect(page.locator('#subtotal')).toHaveText('$2.00');
+    expect(downloads).toEqual([]);
     expect(popups).toEqual([]);
     await ctx.close();
   }
@@ -299,8 +290,10 @@ test('web-only: Spanish chooser describes a web app added by the browser', async
   await page.click('#lang-btn');
   await page.click('#install-btn');
   await expect(page.locator('#install-heading')).toHaveText("Agrega Josh's Tacos a tu pantalla de inicio");
-  await expect(page.locator('#install-web')).toContainText('app web');
-  await expect(page.locator('#install-launch')).toContainText('sin la barra de direcciones');
+  await expect(page.locator('#install-web')).toContainText('sitio web, no una app para descargar');
+  await expect(page.locator('#install-launch')).toContainText('pestaña normal del navegador');
+  await expect(page.locator('#panel-android')).toContainText('Crear acceso directo');
+  await expect(page.locator('.install-link-row')).toContainText('Enlace de la app:');
   await ctx.close();
 });
 

@@ -97,23 +97,27 @@ refocuses (and, separately, reopens) the app, and asserts v2 is active, the cart
 exactly one reload happened, the old cache is gone, and a second focus does not reload.
 The last run's output is in `docs/evidence/upgrade-proof.json`.
 
-## Install chooser
+## Install (web link + home-screen guidance)
 
-Josh's Tacos is **web-only**: there is no app-provided Android package (APK/AAB), no app-store
-listing and no native wrapper. "Install" means the browser adds the web app to the home screen;
-installed launches open standalone (no address bar) from `display: "standalone"` in the manifest.
-Normal browser tabs keep their usual controls. `tests/unit/web-only.test.js` and the
-"web-only" e2e tests fail if an APK/store link, download link or native package is introduced.
+Josh's Tacos is **web-only**. "Install" is a plain link to the app plus guidance; there is no
+app-provided Android package (APK/AAB), no app-store listing and no native wrapper.
 
-The **Install app** button opens a bottom sheet with two options:
+- The app **never calls `prompt()`** on `beforeinstallprompt` and never triggers the browser's
+  native install prompt. It suppresses the browser's automatic prompt (`preventDefault()`) and
+  discards the event.
+- The **Install app** button opens a sheet (EN/ES) with the app link (`./`, i.e. the same URL,
+  https://computingmadeeasy.org/joshs-tacos/ in production). The link opens in a normal browser
+  tab with the usual browser controls.
+- Two options: **Android** (Chrome menu ⋮ → *Add to Home screen*, choose *Create shortcut* if
+  Chrome asks, or bookmark with ☆) and **iPhone / iPad** (Safari → Share → *Add to Home Screen* →
+  *Add*, or Share → *Add Bookmark*). The detected platform is highlighted and opened first.
+- When launched standalone from the home screen, the button reads **Installed** and the sheet is
+  not shown. The manifest keeps `display: "standalone"`, icons and colours, so a home-screen launch
+  may open full screen where the browser supports it; this is not guaranteed and normal tabs keep
+  their controls.
 
-- **Android**: if Chrome fired `beforeinstallprompt`, an **Add to Home screen** button shows the
-  browser's own prompt. Otherwise (or after it's dismissed) it shows the steps: Chrome menu ⋮ → *Install app* /
-  *Add to Home screen* → *Install*.
-- **iPhone / iPad**: four illustrated steps: open in Safari → tap Share → *Add to Home Screen* → *Add*.
-
-The detected platform is highlighted ("Your device") and opened first. When the app already runs
-standalone the button reads **Installed** and the chooser is never shown.
+`tests/unit/web-only.test.js` and the "web-only" e2e test fail if a native package, store link,
+download link, `prompt()` call or install button is introduced.
 
 ## Notes
 

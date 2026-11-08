@@ -46,42 +46,26 @@ function fakeWindow({ standalone = false } = {}) {
   };
 }
 
-describe('install', () => {
-  it('shows manual instructions until beforeinstallprompt fires', async () => {
+describe('install (web-only guidance, no native prompt)', () => {
+  it('suppresses beforeinstallprompt and never calls prompt()', () => {
     const win = fakeWindow();
     const inst = createInstaller(win);
+    const evt = { preventDefault: vi.fn(), prompt: vi.fn() };
+    win.fire('beforeinstallprompt', evt);
+    expect(evt.preventDefault).toHaveBeenCalled();
+    expect(evt.prompt).not.toHaveBeenCalled();
     expect(inst.state).toBe('manual');
-    expect(await inst.install()).toBe('manual');
+    expect(inst.install).toBeUndefined(); // no programmatic install path exists
   });
 
-  it('captures beforeinstallprompt and calls prompt()', async () => {
+  it('shows Installed when running standalone or after the browser reports appinstalled', () => {
+    expect(createInstaller(fakeWindow({ standalone: true })).state).toBe('installed');
     const win = fakeWindow();
     const onChange = vi.fn();
     const inst = createInstaller(win, onChange);
-    const evt = { preventDefault: vi.fn(), prompt: vi.fn().mockResolvedValue(), userChoice: Promise.resolve({ outcome: 'accepted' }) };
-    win.fire('beforeinstallprompt', evt);
-    expect(evt.preventDefault).toHaveBeenCalled();
-    expect(inst.state).toBe('prompt');
-    expect(await inst.install()).toBe('accepted');
-    expect(evt.prompt).toHaveBeenCalledOnce();
-    expect(inst.state).toBe('installed');
-    expect(onChange).toHaveBeenCalled();
-  });
-
-  it('handles a dismissed prompt', async () => {
-    const win = fakeWindow();
-    const inst = createInstaller(win);
-    win.fire('beforeinstallprompt', { preventDefault() {}, prompt: async () => {}, userChoice: Promise.resolve({ outcome: 'dismissed' }) });
-    expect(await inst.install()).toBe('dismissed');
-    expect(inst.state).toBe('manual');
-  });
-
-  it('shows Installed when running standalone or after appinstalled', () => {
-    expect(createInstaller(fakeWindow({ standalone: true })).state).toBe('installed');
-    const win = fakeWindow();
-    const inst = createInstaller(win);
     win.fire('appinstalled');
     expect(inst.state).toBe('installed');
+    expect(onChange).toHaveBeenCalled();
     expect(isStandalone({ navigator: { standalone: true } })).toBe(true);
   });
 
@@ -93,26 +77,21 @@ describe('install', () => {
 });
 
 describe('install chooser', () => {
-  it('is hidden when running standalone (already installed)', () => {
+  it('is hidden when running standalone (launched from the home screen)', () => {
     for (const platform of ['ios', 'android', 'other']) {
       expect(chooserModel({ state: 'installed', platform }).show).toBe(false);
     }
   });
 
   it('auto-highlights and opens iPhone/iPad on iOS', () => {
-    expect(chooserModel({ state: 'manual', platform: 'ios' })).toEqual({ show: true, highlight: 'apple', initial: 'apple', androidPrompt: false });
+    expect(chooserModel({ state: 'manual', platform: 'ios' })).toEqual({ show: true, highlight: 'apple', initial: 'apple' });
   });
 
-  it('auto-highlights Android and uses the captured prompt when available', () => {
-    expect(chooserModel({ state: 'prompt', platform: 'android' })).toEqual({ show: true, highlight: 'android', initial: 'android', androidPrompt: true });
+  it('auto-highlights and opens Android on Android', () => {
+    expect(chooserModel({ state: 'manual', platform: 'android' })).toEqual({ show: true, highlight: 'android', initial: 'android' });
   });
 
-  it('Android without a captured prompt falls back to the Chrome menu steps', () => {
-    expect(chooserModel({ state: 'manual', platform: 'android' })).toEqual({ show: true, highlight: 'android', initial: 'android', androidPrompt: false });
-  });
-
-  it('unknown/desktop: nothing highlighted; opens Android only if a prompt exists', () => {
-    expect(chooserModel({ state: 'manual', platform: 'other' })).toEqual({ show: true, highlight: null, initial: null, androidPrompt: false });
-    expect(chooserModel({ state: 'prompt', platform: 'other' }).initial).toBe('android');
+  it('unknown/desktop: nothing highlighted or opened', () => {
+    expect(chooserModel({ state: 'manual', platform: 'other' })).toEqual({ show: true, highlight: null, initial: null });
   });
 });

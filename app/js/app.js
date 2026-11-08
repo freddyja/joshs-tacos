@@ -304,8 +304,8 @@ function renderChooser() {
   document.querySelectorAll('#install-dialog [data-panel]').forEach((panel) => {
     panel.hidden = panel.dataset.panel !== chooserSelection;
   });
-  // Android: use the captured beforeinstallprompt when we have it, else show the steps.
-  $('#android-install-now').hidden = !model.androidPrompt;
+  // Plain link to the app (same URL, relative so it works under /joshs-tacos/).
+  $('#install-link').textContent = appUrl();
 }
 
 function selectChoice(choice) {
@@ -322,18 +322,6 @@ function onInstall() {
   chooserSelection = model.initial;
   renderChooser();
   showDialog($('#install-dialog'));
-}
-
-async function onAndroidInstallNow() {
-  const res = await installer.install();
-  if (res === 'accepted' || res === 'installed') {
-    $('#install-dialog').close();
-    toast(state.t('install.accepted'));
-  } else {
-    if (res === 'dismissed') toast(state.t('install.dismissed'));
-    renderChooser(); // prompt is used up: the manual steps remain visible
-  }
-  renderInstallButton();
 }
 
 // ---------- updates ----------
@@ -396,7 +384,6 @@ function wire() {
   $('#install-btn').addEventListener('click', onInstall);
   document.querySelectorAll('#install-dialog .choice').forEach((btn) =>
     btn.addEventListener('click', () => selectChoice(btn.dataset.choice)));
-  $('#android-install-now').addEventListener('click', onAndroidInstallNow);
   $('#update-btn').addEventListener('click', onManualUpdate);
   $('#review-btn').addEventListener('click', openComposer);
   $('#clear-btn').addEventListener('click', () => {
